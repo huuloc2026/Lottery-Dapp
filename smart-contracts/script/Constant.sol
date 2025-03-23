@@ -1,0 +1,1 @@
+uint256 constant ENTRANCE_FEE = 0.01 ether;
