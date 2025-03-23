@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
+import {VRFConsumerBaseV2Plus} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
+import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 
 /// @title Lottery Contract
 /// @author jakedev
@@ -13,9 +15,9 @@ pragma solidity ^0.8.19;
 ///      - Time-based lottery rounds or a mechanism to trigger the lottery draw.
 ///      - Security considerations to prevent manipulation and ensure fairness.
 ///      - Potential for different prize tiers based on number matches.
-contract Lottery {
+contract Lottery is VRFConsumerBaseV2Plus {
     /*//////////////////////////////////////////////////////////////
-                            erros
+                             Errors          
     //////////////////////////////////////////////////////////////*/
     error Invalid_EntryFree_Error();
     error Lottery_CLOSED_Error();
@@ -31,12 +33,12 @@ contract Lottery {
     /*//////////////////////////////////////////////////////////////
                           Chainlink VRF variables
     //////////////////////////////////////////////////////////////*/
-    uint256 public s_subscriptionId;
-    address public s_vrfCoordinator = 0x8103B0A8A00be2DDC778e6e7eaa21791Cd364625; // Sepolia VRF Coordinator
-    bytes32 public s_keyHash = 0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c; // Sepolia key hash
-    uint32 public s_callbackGasLimit = 100000;
-    uint16 public s_requestConfirmations = 3;
-    uint32 public s_numWords = 1;
+    uint256 i_subscriptionId;
+    address immutable private i_vrfCoordinator ;
+    bytes32 immutable private i_keyHash;
+    uint32 immutable private i_callbackGasLimit;
+    uint16 private constant s_requestConfirmations = 3;
+    uint32 constant s_numWords = 1;
 
 
     /*//////////////////////////////////////////////////////////////
@@ -58,9 +60,13 @@ contract Lottery {
     /*//////////////////////////////////////////////////////////////
                                FUNCTIONS
     //////////////////////////////////////////////////////////////*/
-    constructor(uint256 entryFee){
+    constructor(uint256 entryFee, uint256 subscriptionId, address vrfCoordinator,bytes32 keyHash,uint16 callbackGasLimit){
         i_entryFee = entryFee;
         lotteryOpen = LotteryState.OPEN; /// open when deployed smart contract
+        i_subscriptionId = subscriptionId;
+        i_vrfCoordinator = vrfCoordinator;
+        i_keyHash = keyHash;
+        i_callbackGasLimit;
     } 
 
     /*//////////////////////////////////////////////////////////////
