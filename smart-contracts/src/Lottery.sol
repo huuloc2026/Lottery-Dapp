@@ -60,6 +60,7 @@ contract Lottery {
     //////////////////////////////////////////////////////////////*/
     constructor(uint256 entryFee){
         i_entryFee = entryFee;
+        lotteryOpen = LotteryState.OPEN; /// open when deployed smart contract
     } 
 
     /*//////////////////////////////////////////////////////////////
@@ -70,7 +71,6 @@ contract Lottery {
         if(lotteryOpen == LotteryState.CLOSE){
             revert Lottery_CLOSED_Error();
         }
-        
         //CHECK FEE
         if(msg.value != i_entryFee){
             revert Invalid_EntryFree_Error();
@@ -79,4 +79,22 @@ contract Lottery {
         s_players.push(msg.sender);
         emit WHO_LotteryEnter(msg.sender);
     }
+
+    /*//////////////////////////////////////////////////////////////
+                            GETTER FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
+    function getEntranceFee() public view returns (uint256){
+        return i_entryFee;
+    }
+    function getRewardBalance() public view returns (uint256){
+        return s_rewardBalance;
+    }
+
+    function getPlayerByIndex(uint256 index) public view returns (address){
+        return s_players[index];
+    }
+    function getPlayersLength() public view returns (uint256){
+        return s_players.length;
+    }
+    
 }
